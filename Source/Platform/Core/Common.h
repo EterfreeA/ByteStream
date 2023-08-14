@@ -18,7 +18,7 @@ bool getImagePath(std::string& _path);
 bool getImagePath(std::wstring& _path);
 
 // 暂停指定时间
-void sleepFor(std::chrono::steady_clock::rep _duration);
+void sleepFor(std::chrono::nanoseconds::rep _duration);
 
 //template <typename _Type>
 //_Type reverse(_Type _value) noexcept

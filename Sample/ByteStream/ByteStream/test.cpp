@@ -112,6 +112,7 @@ static const char* PARAGRAPH[] = {
 int main()
 {
 	using SizeType = ByteStream::SizeType;
+
 	using std::cout, std::boolalpha, std::endl;
 
 	constexpr SizeType CAPACITY = 2;

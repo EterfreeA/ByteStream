@@ -42,6 +42,7 @@ void print(const BitSet<_ValueType>& _bitSet, \
 int main()
 {
 	using BitSet = BitSet<std::uint64_t>;
+
 	using std::cout, std::endl;
 
 	constexpr auto SIZE = sizeof(BitSet::ValueType) * CHAR_BIT;
