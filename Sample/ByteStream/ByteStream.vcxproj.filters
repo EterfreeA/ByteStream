@@ -44,5 +44,8 @@
     <ClInclude Include="..\..\Source\Platform\Core\Common.h">
       <Filter>Source\Platform\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Platform\Common.h">
+      <Filter>Source\Platform</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

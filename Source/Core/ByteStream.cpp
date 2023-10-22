@@ -7,6 +7,8 @@
 
 ETERFREE_SPACE_BEGIN
 
+using namespace Platform;
+
 auto ByteStream::getMaxSize(SizeType _maxSize, \
 	bool _checksum) noexcept -> SizeType
 {

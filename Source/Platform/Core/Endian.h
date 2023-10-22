@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#include "Core/Common.hpp"
+#include "Platform/Common.h"
 
-ETERFREE_SPACE_BEGIN
+PLATFORM_SPACE_BEGIN
 
 // 小端模式
 inline bool little() noexcept
@@ -110,4 +110,4 @@ float ntoh(std::uint32_t _value);
 template <>
 double ntoh(std::uint64_t _value);
 
-ETERFREE_SPACE_END
+PLATFORM_SPACE_END

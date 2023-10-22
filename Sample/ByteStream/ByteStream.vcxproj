@@ -27,6 +27,7 @@
     <ClInclude Include="..\..\Source\Core\BitSet.hpp" />
     <ClInclude Include="..\..\Source\Core\Common.hpp" />
     <ClInclude Include="..\..\Source\Core\ByteStream.h" />
+    <ClInclude Include="..\..\Source\Platform\Common.h" />
     <ClInclude Include="..\..\Source\Platform\Core\Common.h" />
     <ClInclude Include="..\..\Source\Platform\Core\Endian.h" />
   </ItemGroup>

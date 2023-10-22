@@ -4,7 +4,7 @@
 #include <WinSock2.h>
 #pragma comment(lib, "WS2_32.Lib")
 
-ETERFREE_SPACE_BEGIN
+PLATFORM_SPACE_BEGIN
 
 std::uint16_t hton(std::uint16_t _value)
 {
@@ -69,4 +69,4 @@ double ntoh(std::uint64_t _value)
 	return ntohd(_value);
 }
 
-ETERFREE_SPACE_END
+PLATFORM_SPACE_END
