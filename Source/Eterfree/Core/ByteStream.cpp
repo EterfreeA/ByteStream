@@ -1,5 +1,5 @@
 ﻿#include "ByteStream.h"
-#include "Platform/Core/Endian.h"
+#include "Eterfree/Platform/Core/Endian.h"
 
 #include <utility>
 #include <climits>
@@ -12,53 +12,45 @@ using namespace Platform;
 auto ByteStream::getMaxSize(SizeType _maxSize, \
 	bool _checksum) noexcept -> SizeType
 {
-	if (_maxSize <= 0)
-		_maxSize = MAX_STREAM_SIZE;
+	if (_maxSize <= 0) _maxSize = MAX_SIZE;
 
 	if (_maxSize < SIZE) return 0;
 
 	_maxSize -= SIZE;
 	if (_checksum)
 		_maxSize = _maxSize >= SIZE ? \
-		_maxSize - SIZE : 0;
+			_maxSize - SIZE : 0;
 	return _maxSize;
 }
 
-auto ByteStream::calculateSum(const char* _data, SizeType _size, \
-	bool _endian) -> StreamSize
+auto ByteStream::calculateSum(const char* _data, \
+	SizeType _size, bool _endian) -> StreamSize
 {
-	static thread_local Buffer buffer;
+	constexpr auto SIZE_BIT = SIZE * CHAR_BIT;
 
-	auto address = reinterpret_cast<SizeType>(_data);
-	if (address % ALIGNMENT != 0)
-	{
-		buffer.resize(ALIGNMENT + _size);
-		address = reinterpret_cast<SizeType>(buffer.data());
-		auto offset = address % ALIGNMENT;
-		auto pointer = buffer.data() + offset;
-		std::memcpy(pointer, _data, _size);
-		_data = pointer;
-	}
+	constexpr auto ntohss = ntoh<StreamSize, StreamSize>;
 
 	auto size = _size % SIZE;
 	_size -= size;
 
 	std::uint64_t sum = 0;
-	if (_endian)
+	auto address = reinterpret_cast<SizeType>(_data);
+	if (address % ALIGNMENT == 0)
 		for (decltype(_size) index = 0; \
 			index < _size; index += SIZE)
 		{
 			auto data = _data + index;
 			auto value = *reinterpret_cast<const StreamSize*>(data);
-			value = ntoh<StreamSize, StreamSize>(value);
+			if (_endian) value = ntohss(value);
 			sum += value;
 		}
 	else
 		for (decltype(_size) index = 0; \
 			index < _size; index += SIZE)
 		{
-			auto data = _data + index;
-			auto value = *reinterpret_cast<const StreamSize*>(data);
+			StreamSize value = 0;
+			std::memcpy(&value, _data + index, SIZE);
+			if (_endian) value = ntohss(value);
 			sum += value;
 		}
 
@@ -66,12 +58,12 @@ auto ByteStream::calculateSum(const char* _data, SizeType _size, \
 	{
 		StreamSize value = 0;
 		std::memcpy(&value, _data + _size, size);
-		if (_endian) value = ntoh<StreamSize, StreamSize>(value);
+		if (_endian) value = ntohss(value);
 		sum += value;
 	}
 
-	while (sum > MAX_STREAM_SIZE)
-		sum = (sum & MAX_STREAM_SIZE) + (sum >> SIZE * CHAR_BIT);
+	while (sum > MAX_SIZE)
+		sum = (sum & MAX_SIZE) + (sum >> SIZE_BIT);
 	return static_cast<StreamSize>(sum);
 }
 
@@ -83,8 +75,8 @@ auto ByteStream::convertSum(StreamSize _sum, \
 	return _sum;
 }
 
-bool ByteStream::checkSum(const char* _data, StreamSize _sum, \
-	bool _endian)
+bool ByteStream::checkSum(const char* _data, \
+	StreamSize _sum, bool _endian)
 {
 	decltype(_sum) sum = 0;
 	auto address = reinterpret_cast<SizeType>(_data);
@@ -93,8 +85,9 @@ bool ByteStream::checkSum(const char* _data, StreamSize _sum, \
 	else
 		std::memcpy(&sum, _data, SIZE);
 
-	if (_endian) sum = ntoh<StreamSize, StreamSize>(sum);
-	return _sum + sum == MAX_STREAM_SIZE;
+	if (_endian)
+		sum = ntoh<StreamSize, StreamSize>(sum);
+	return _sum + sum == MAX_SIZE;
 }
 
 void ByteStream::clearFlag() noexcept
@@ -121,13 +114,13 @@ auto OutputByteStream::getSize(SizeType _offset) const \
 	return size;
 }
 
-void OutputByteStream::limit(SizeType _capacity, \
-	SizeType _maxSize) noexcept
+void OutputByteStream::limit(SizeType _maxSize, \
+	SizeType _capacity) noexcept
 {
+	storeMaxSize(_maxSize);
+
 	this->_capacity.store(_capacity, \
 		std::memory_order::relaxed);
-
-	storeMaxSize(_maxSize);
 }
 
 bool OutputByteStream::idle() const noexcept
@@ -231,9 +224,10 @@ void OutputByteStream::take(SizeType _size)
 
 void OutputByteStream::clear() noexcept
 {
+	_queue.clear();
+
 	_offset = 0;
 	_buffer.clear();
-	_queue.clear();
 }
 
 bool InputByteStream::getSize()
@@ -266,16 +260,19 @@ bool InputByteStream::getPacket()
 	auto flag = loadFlag();
 	if (existFlag(flag, FLAG_TYPE_CHECKSUM))
 	{
-		bool endian = existFlag(flag, FLAG_TYPE_ENDIAN);
+		bool endian = existFlag(flag, \
+			FLAG_TYPE_ENDIAN);
 		auto data = _buffer.data() + _offset;
 
 		size = static_cast<decltype(size)>(SIZE);
-		auto sum = calculateSum(data + size, _size, endian);
+		auto sum = calculateSum(data + size, \
+			_size, endian);
 		result = checkSum(data, sum, endian);
 	}
 
 	if (result)
-		_queue.emplace_back(_buffer, _offset + size, _size);
+		_queue.emplace_back(_buffer, \
+			_offset + size, _size);
 	return result;
 }
 
@@ -284,16 +281,15 @@ bool InputByteStream::flushBuffer()
 	bool result = true;
 	decltype(_offset) offset = 0;
 
-	bool checksum = existFlag(FLAG_TYPE_CHECKSUM);
+	StreamSize extraSize = 0;
+	if (existFlag(FLAG_TYPE_CHECKSUM))
+		extraSize = static_cast<StreamSize>(SIZE);
+
 	do
 	{
 		if (_size <= 0 \
 			and not getSize())
 			break;
-
-		StreamSize extraSize = 0;
-		if (checksum)
-			extraSize = static_cast<StreamSize>(SIZE);
 
 		auto size = _buffer.size() - _offset;
 		if (size >= _size \
@@ -316,13 +312,13 @@ bool InputByteStream::flushBuffer()
 	return result;
 }
 
-void InputByteStream::limit(SizeType _capacity, \
-	SizeType _maxSize) noexcept
+void InputByteStream::limit(SizeType _maxSize, \
+	SizeType _capacity) noexcept
 {
+	storeMaxSize(_maxSize);
+
 	this->_capacity.store(_capacity, \
 		std::memory_order::relaxed);
-
-	storeMaxSize(_maxSize);
 }
 
 bool InputByteStream::idle() const noexcept
@@ -336,8 +332,7 @@ bool InputByteStream::put(const char* _data, \
 	SizeType _size, SizeType& _offset)
 {
 	auto maxSize = loadMaxSize();
-	if (maxSize <= 0)
-		maxSize = MAX_STREAM_SIZE;
+	if (maxSize <= 0) maxSize = MAX_SIZE;
 
 	auto size = _buffer.size();
 	if (size > maxSize) return false;
@@ -349,6 +344,19 @@ bool InputByteStream::put(const char* _data, \
 	_buffer.append(_data + _offset, _size);
 	_offset += _size;
 	return flushBuffer();
+}
+
+bool InputByteStream::put(const char* _data, \
+	SizeType _size)
+{
+	decltype(_size) offset = 0;
+	while (offset < _size)
+		if (not put(_data, _size, offset))
+		{
+			reset();
+			return false;
+		}
+	return true;
 }
 
 bool InputByteStream::take(Buffer& _packet) noexcept

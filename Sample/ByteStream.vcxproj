@@ -19,17 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Core\ByteStream.cpp" />
-    <ClCompile Include="..\..\Source\Platform\Core\Windows\Endian.cpp" />
+    <ClCompile Include="..\Source\Eterfree\Core\ByteStream.cpp" />
+    <ClCompile Include="..\Source\Eterfree\Platform\Core\Windows\Endian.cpp" />
     <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Core\BitSet.hpp" />
-    <ClInclude Include="..\..\Source\Core\Common.hpp" />
-    <ClInclude Include="..\..\Source\Core\ByteStream.h" />
-    <ClInclude Include="..\..\Source\Platform\Common.h" />
-    <ClInclude Include="..\..\Source\Platform\Core\Common.h" />
-    <ClInclude Include="..\..\Source\Platform\Core\Endian.h" />
+    <ClInclude Include="..\Source\Eterfree\Core\BitSet.hpp" />
+    <ClInclude Include="..\Source\Eterfree\Core\ByteStream.h" />
+    <ClInclude Include="..\Source\Eterfree\Core\Common.hpp" />
+    <ClInclude Include="..\Source\Eterfree\Platform\Common.h" />
+    <ClInclude Include="..\Source\Eterfree\Platform\Core\Common.h" />
+    <ClInclude Include="..\Source\Eterfree\Platform\Core\Endian.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -107,6 +107,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Source</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,6 +124,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Source</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +141,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Source</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,6 +158,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Source</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

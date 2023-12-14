@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{7e628545-7356-4a84-921f-48d3c78e7974}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Core">
+      <UniqueIdentifier>{a9d19fdd-86fd-4b0d-8c50-7fa81acad790}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{6ab7ddcb-08f3-4f81-aa45-eadc79ecdffc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="..\Source\Eterfree\Core\ByteStream.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Eterfree\Platform\Core\Windows\Endian.cpp">
+      <Filter>Platform\Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\Eterfree\Core\BitSet.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Eterfree\Core\ByteStream.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Eterfree\Core\Common.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Eterfree\Platform\Common.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Eterfree\Platform\Core\Common.h">
+      <Filter>Platform\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Eterfree\Platform\Core\Endian.h">
+      <Filter>Platform\Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

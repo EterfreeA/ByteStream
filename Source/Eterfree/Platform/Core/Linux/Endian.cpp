@@ -1,5 +1,4 @@
-﻿#include "Platform/Core/Endian.h"
-#include "Platform/Core/Common.h"
+﻿#include "Eterfree/Platform/Core/Endian.h"
 
 #include <arpa/inet.h>
 

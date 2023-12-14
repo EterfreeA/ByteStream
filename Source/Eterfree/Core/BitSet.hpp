@@ -23,7 +23,7 @@ template <std::unsigned_integral _BitSet>
 bool existBit(_BitSet _bitSet, std::size_t _position) noexcept
 {
 	return _position < sizeof _bitSet ? \
-		_bitSet & generateBit<_BitSet>(_position) : false;
+		(_bitSet & generateBit<_BitSet>(_position)) > 0 : false;
 }
 
 template <std::unsigned_integral _BitSet>
@@ -43,8 +43,7 @@ template <std::unsigned_integral _BitSet>
 void setBit(_BitSet& _bitSet, std::size_t _position, \
 	bool _value = true) noexcept
 {
-	if (not _value)
-		resetBit(_bitSet, _position);
+	if (not _value) resetBit(_bitSet, _position);
 	else if (_position < sizeof _bitSet)
 		_bitSet |= generateBit<_BitSet>(_position);
 }
@@ -145,12 +144,12 @@ public:
 	BitSet(const ValueType* _data, SizeType _size) : \
 		_vector(_data, _data + _size) {}
 
-	bool operator==(const BitSet& _another) const noexcept;
+	bool operator==(const BitSet& _bitSet) const noexcept;
 
 	// C++ 20 != 采用 == 推导
-	//bool operator!=(const BitSet& _another) const noexcept
+	//bool operator!=(const BitSet& _bitSet) const noexcept
 	//{
-	//	return not (*this == _another);
+	//	return not (*this == _bitSet);
 	//}
 
 	bool operator[](SizeType _position) const noexcept
@@ -345,20 +344,20 @@ void BitSet<_ValueType>::traverse(SizeType _begin, SizeType _end, \
 }
 
 template <std::unsigned_integral _ValueType>
-bool BitSet<_ValueType>::operator==(const BitSet& _another) const noexcept
+bool BitSet<_ValueType>::operator==(const BitSet& _bitSet) const noexcept
 {
-	if (this == &_another) return true;
+	if (this == &_bitSet) return true;
 
 	auto bitSet = this;
-	auto size = _another._vector.size();
+	auto size = _bitSet._vector.size();
 	if (this->_vector.size() < size)
 	{
-		bitSet = &_another;
+		bitSet = &_bitSet;
 		size = this->_vector.size();
 	}
 
 	auto left = this->_vector.data();
-	auto right = _another._vector.data();
+	auto right = _bitSet._vector.data();
 	if (std::memcmp(left, right, sizeof *left * size) != 0) return false;
 
 	for (auto index = size; index < bitSet->_vector.size(); ++index)

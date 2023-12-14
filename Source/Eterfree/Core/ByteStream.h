@@ -35,7 +35,7 @@ protected:
 	static constexpr auto SIZE = sizeof(StreamSize);
 
 public:
-	static constexpr auto MAX_STREAM_SIZE = UINT32_MAX;
+	static constexpr auto MAX_SIZE = UINT32_MAX;
 
 protected:
 	std::atomic<FlagType> _flag;
@@ -120,7 +120,6 @@ public:
 
 class OutputByteStream : public ByteStream
 {
-private:
 	std::atomic<SizeType> _capacity;
 	QueueType _queue;
 
@@ -131,7 +130,7 @@ private:
 	StreamSize getSize(SizeType _offset) const;
 
 public:
-	OutputByteStream(SizeType _capacity = 0, SizeType _maxSize = 0) : \
+	OutputByteStream(SizeType _maxSize = 0, SizeType _capacity = 0) : \
 		ByteStream(_maxSize), _capacity(_capacity), _offset(0) {}
 
 	auto capacity() const noexcept
@@ -139,7 +138,7 @@ public:
 		return _capacity.load(std::memory_order::relaxed);
 	}
 
-	void limit(SizeType _capacity, SizeType _maxSize) noexcept;
+	void limit(SizeType _maxSize, SizeType _capacity) noexcept;
 
 	bool empty() const noexcept
 	{
@@ -160,7 +159,7 @@ public:
 
 	void take(SizeType _size);
 
-	void rewind() noexcept
+	void reset() noexcept
 	{
 		_offset = 0;
 	}
@@ -184,7 +183,7 @@ private:
 	bool flushBuffer();
 
 public:
-	InputByteStream(SizeType _capacity = 0, SizeType _maxSize = 0) : \
+	InputByteStream(SizeType _maxSize = 0, SizeType _capacity = 0) : \
 		ByteStream(_maxSize), _capacity(_capacity), _size(0), _offset(0) {}
 
 	auto capacity() const noexcept
@@ -192,30 +191,33 @@ public:
 		return _capacity.load(std::memory_order::relaxed);
 	}
 
-	void limit(SizeType _capacity, SizeType _maxSize) noexcept;
+	void limit(SizeType _maxSize, SizeType _capacity) noexcept;
 
 	bool empty() const noexcept
 	{
 		return _queue.empty();
 	}
 
+	// 先调用idle，再进行receive，最后调用put
 	bool idle() const noexcept;
 
-	/*
-	* bool put(const char* _data, SizeType _size)
-	* {
-	* 	decltype(_size) offset = 0;
-	* 	while (offset < _size)
-	* 		if (not put(_data, _size, offset))
-	* 			return false;
-	* 	return true;
-	* }
-	*/
+	bool flush()
+	{
+		return flushBuffer();
+	}
+
 	bool put(const char* _data, SizeType _size, SizeType& _offset);
 
 	bool put(const Buffer& _buffer, SizeType& _offset)
 	{
 		return put(_buffer.data(), _buffer.size(), _offset);
+	}
+
+	bool put(const char* _data, SizeType _size);
+
+	bool put(const Buffer& _buffer)
+	{
+		return put(_buffer.data(), _buffer.size());
 	}
 
 	bool take(Buffer& _packet) noexcept;
@@ -226,11 +228,6 @@ public:
 		return not _queue.empty();
 	}
 
-	bool flush()
-	{
-		return flushBuffer();
-	}
-
 	void reset() noexcept
 	{
 		_size = _offset = 0;
@@ -239,8 +236,8 @@ public:
 
 	void clear() noexcept
 	{
-		reset();
 		_queue.clear();
+		reset();
 	}
 };
 

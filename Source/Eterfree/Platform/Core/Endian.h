@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "Platform/Common.h"
+#include "Common.h"
 
 PLATFORM_SPACE_BEGIN
 
@@ -57,7 +57,7 @@ template <typename _Source, typename _Target>
 _Target ntoh(_Source _value);
 
 template <>
-inline std::uint8_t ntoh(std::uint8_t _value) noexcept
+inline std::uint8_t ntoh(std::uint8_t _value)
 {
 	return _value;
 }
@@ -72,7 +72,7 @@ template <>
 std::uint64_t ntoh(std::uint64_t _value);
 
 template <>
-inline std::int8_t ntoh(std::uint8_t _value) noexcept
+inline std::int8_t ntoh(std::uint8_t _value)
 {
 	return static_cast<std::int8_t>(_value);
 }
@@ -99,7 +99,7 @@ inline std::int64_t ntoh(std::uint64_t _value)
 }
 
 template <>
-inline bool ntoh(std::uint8_t _value) noexcept
+inline bool ntoh(std::uint8_t _value)
 {
 	return static_cast<bool>(_value);
 }

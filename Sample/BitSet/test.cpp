@@ -1,4 +1,4 @@
-﻿#include "Core/BitSet.hpp"
+﻿#include "Eterfree/Core/BitSet.hpp"
 
 #include <concepts>
 #include <cstdlib>
@@ -9,7 +9,7 @@
 USING_ETERFREE_SPACE
 
 template <std::unsigned_integral _ValueType>
-void print(const BitSet<_ValueType>& _bitSet)
+static void print(const BitSet<_ValueType>& _bitSet)
 {
 	using std::cout, std::endl;
 
@@ -22,7 +22,7 @@ void print(const BitSet<_ValueType>& _bitSet)
 }
 
 template <std::unsigned_integral _ValueType>
-void print(const BitSet<_ValueType>& _bitSet, \
+static void print(const BitSet<_ValueType>& _bitSet, \
 	typename BitSet<_ValueType>::SizeType _position)
 {
 	std::cout << std::boolalpha << _position << ": " \
@@ -31,7 +31,7 @@ void print(const BitSet<_ValueType>& _bitSet, \
 
 template <std::unsigned_integral _ValueType, \
 	typename... _Positions>
-void print(const BitSet<_ValueType>& _bitSet, \
+static void print(const BitSet<_ValueType>& _bitSet, \
 	typename BitSet<_ValueType>::SizeType _position, \
 	_Positions... _positions)
 {

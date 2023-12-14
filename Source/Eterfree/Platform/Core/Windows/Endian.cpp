@@ -1,5 +1,4 @@
-﻿#include "Platform/Core/Endian.h"
-#include "Platform/Core/Common.h"
+﻿#include "Eterfree/Platform/Core/Endian.h"
 
 #include <WinSock2.h>
 #pragma comment(lib, "WS2_32.Lib")
